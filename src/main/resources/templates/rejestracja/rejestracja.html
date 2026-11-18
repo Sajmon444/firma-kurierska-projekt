@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Rejestracja</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rejestracja</h1>
+
+        <div id="error-message" class="error"></div>
+
+        <form id="register-form" action="sukces.html" method="get">
+            <div class="form-group">
+                <label for="login">Login</label>
+                <input type="text" id="login" name="login" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Numer telefonu</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Powtórz hasło</label>
+                <input type="password" id="confirm-password" name="confirmPassword" required>
+            </div>
+
+            <button type="submit">Zarejestruj się</button>
+        </form>
+
+        <div class="link">
+            Masz już konto? <a href="logowanie.html">Zaloguj się</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function (event) {
+            const login = document.getElementById('login').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorBox = document.getElementById('error-message');
+
+            errorBox.textContent = '';
+
+            if (login.length < 3) {
+                event.preventDefault();
+                errorBox.textContent = 'Login musi mieć co najmniej 3 znaki.';
+                return;
+            }
+
+            if (!/^[0-9+\-\s]{9,15}$/.test(phone)) {
+                event.preventDefault();
+                errorBox.textContent = 'Podaj poprawny numer telefonu (9-15 znaków).';
+                return;
+            }
+
+            if (password.length < 6) {
+                event.preventDefault();
+                errorBox.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                errorBox.textContent = 'Hasła nie są takie same.';
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
