@@ -49,7 +49,8 @@ public class UserRegistrationController {
     ) {
         try {
             userRegistrationService.registerUser(login, phone, password, confirmPassword);
-            return "redirect:/rejestracja/sukces.html";
+            String encodedLogin = UriUtils.encode(login.trim(), StandardCharsets.UTF_8);
+            return "redirect:/home.html?login=" + encodedLogin;
         } catch (IllegalArgumentException e) {
             String encodedError = UriUtils.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/rejestracja/rejestracja.html?error=" + encodedError;

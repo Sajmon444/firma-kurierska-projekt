@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel główny</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid #cccccc;
+            margin-bottom: 20px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        button,
+        .btn-link {
+            padding: 6px 12px;
+            background-color: #eeeeee;
+            border: 1px solid #999999;
+            font-size: 14px;
+            color: #000000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .columns {
+            display: flex;
+            gap: 20px;
+        }
+
+        .column {
+            flex: 1;
+            border: 1px solid #cccccc;
+            padding: 16px;
+            min-height: 400px;
+        }
+
+        .column h2 {
+            font-size: 18px;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>Zalogowany jako: <strong id="username">Użytkownik</strong></span>
+            <button type="button">Nadaj paczkę</button>
+        </div>
+        <div class="top-bar-right">
+            <a href="/rejestracja/logowanie.html" class="btn-link">Wyloguj się</a>
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column">
+            <h2>Paczki nadane</h2>
+            <p>Brak nadanych paczek.</p>
+        </div>
+
+        <div class="column">
+            <h2>Paczki oczekujące</h2>
+            <p>Brak oczekujących paczek.</p>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const login = params.get('login');
+        if (login) {
+            document.getElementById('username').textContent = login;
+        }
+    </script>
+</body>
+</html>

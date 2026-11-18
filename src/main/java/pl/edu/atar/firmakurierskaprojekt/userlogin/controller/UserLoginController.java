@@ -34,7 +34,8 @@ public class UserLoginController {
     ) {
         try {
             userLoginService.loginUser(login, password);
-            return "redirect:/rejestracja/sukces.html";
+            String encodedLogin = UriUtils.encode(login.trim(), StandardCharsets.UTF_8);
+            return "redirect:/home.html?login=" + encodedLogin;
         } catch (IllegalArgumentException e) {
             String encodedError = UriUtils.encode(e.getMessage(), StandardCharsets.UTF_8);
             return "redirect:/rejestracja/logowanie.html?error=" + encodedError;
