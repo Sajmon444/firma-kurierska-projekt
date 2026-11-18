@@ -11,7 +11,7 @@
 
         <div id="error-message" class="error"></div>
 
-        <form id="register-form" action="sukces.html" method="get">
+        <form id="register-form" action="/register" method="post">
             <div class="form-group">
                 <label for="login">Login</label>
                 <input type="text" id="login" name="login" required>
@@ -41,6 +41,12 @@
     </div>
 
     <script>
+        const params = new URLSearchParams(window.location.search);
+        const serverError = params.get('error');
+        if (serverError) {
+            document.getElementById('error-message').textContent = serverError;
+        }
+
         document.getElementById('register-form').addEventListener('submit', function (event) {
             const login = document.getElementById('login').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -56,9 +62,9 @@
                 return;
             }
 
-            if (!/^[0-9+\-\s]{9,15}$/.test(phone)) {
+            if (!/^[0-9]{9}$/.test(phone)) {
                 event.preventDefault();
-                errorBox.textContent = 'Podaj poprawny numer telefonu (9-15 znaków).';
+                errorBox.textContent = 'Podaj poprawny numer telefonu (dokładnie 9 cyfr).';
                 return;
             }
 
