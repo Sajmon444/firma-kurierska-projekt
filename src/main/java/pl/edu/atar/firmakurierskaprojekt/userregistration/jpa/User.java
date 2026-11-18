@@ -12,6 +12,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Reprezentuje encję użytkownika systemu przechowywaną w bazie danych.
+ *
+ * @author Szymon Pawełczyk
+ */
 @Entity
 @Table(name = "users")
 @Getter
