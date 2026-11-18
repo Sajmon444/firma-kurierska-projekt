@@ -4,6 +4,22 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Pliki konfiguracyjne i sekrety ###
+*.yaml
+*.yml
+.env
+*.env
+
+### Logi i lokalne bazy danych ###
+*.log
+*.db
+*.mv.db
+*.trace.db
+
+### Systemy operacyjne ###
+.DS_Store
+Thumbs.db
+
 ### STS ###
 .apt_generated
 .classpath
@@ -18,6 +34,7 @@ target/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### NetBeans ###
 /nbproject/private/
