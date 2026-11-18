@@ -82,12 +82,12 @@
     <div class="columns">
         <div class="column">
             <h2>Paczki nadane</h2>
-            <p>Brak nadanych paczek.</p>
+            <div id="sent-packages">Brak nadanych paczek.</div>
         </div>
 
         <div class="column">
             <h2>Paczki oczekujące</h2>
-            <p>Brak oczekujących paczek.</p>
+            <div id="expected-packages">Brak oczekujących paczek.</div>
         </div>
     </div>
 
@@ -97,6 +97,49 @@
         if (login) {
             document.getElementById('username').textContent = login;
             document.getElementById('send-package-link').href = '/doreczenie/nadaj-paczke.html?login=' + encodeURIComponent(login);
+
+            fetch('/api/doreczenie/paczki?login=' + encodeURIComponent(login))
+                .then(response => response.json())
+                .then(data => {
+                    renderPackages('sent-packages', data.sent, 'Brak nadanych paczek.');
+                    renderPackages('expected-packages', data.expected, 'Brak oczekujących paczek.');
+                });
+        }
+
+        function renderPackages(containerId, packages, emptyText) {
+            const container = document.getElementById(containerId);
+            if (!packages || packages.length === 0) {
+                container.textContent = emptyText;
+                return;
+            }
+
+            container.innerHTML = '';
+            packages.forEach(pkg => {
+                const item = document.createElement('div');
+                item.style.border = '1px solid #dddddd';
+                item.style.padding = '10px';
+                item.style.marginBottom = '10px';
+                item.style.fontSize = '14px';
+
+                const deliveryInfo = pkg.deliveryType === 'LOCKER'
+                    ? 'Paczkomat: ' + (pkg.lockerCode || '') + ', ' + (pkg.lockerCity || '')
+                    : 'Adres: ' + (pkg.street || '') + ', ' + (pkg.postalCode || '') + ' ' + (pkg.city || '');
+
+                item.innerHTML =
+                    '<strong>Odbiorca:</strong> ' + escapeHtml(pkg.recipientName) + ' (' + escapeHtml(pkg.recipientPhone) + ')<br>' +
+                    '<strong>Dostawa:</strong> ' + escapeHtml(deliveryInfo) + '<br>' +
+                    '<strong>Paczka:</strong> ' + escapeHtml(pkg.packageSize) + ', ' + pkg.weight + ' kg<br>' +
+                    '<strong>Status:</strong> ' + escapeHtml(pkg.status);
+
+                container.appendChild(item);
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     </script>
 </body>

@@ -9,7 +9,8 @@
     <div class="container">
         <h1>Nadanie paczki</h1>
 
-        <form action="#" method="post">
+        <form action="/doreczenie/nadaj" method="post">
+            <input type="hidden" id="senderLogin" name="senderLogin">
             <h2>Dane odbiorcy</h2>
 
             <div class="form-group">
@@ -102,6 +103,7 @@
         const params = new URLSearchParams(window.location.search);
         const login = params.get('login');
         if (login) {
+            document.getElementById('senderLogin').value = login;
             document.getElementById('back-link').href = '/home.html?login=' + encodeURIComponent(login);
         }
 
