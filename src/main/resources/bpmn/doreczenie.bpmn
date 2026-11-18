@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0gdju8i" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.51.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
+  <bpmn:collaboration id="Collaboration_1pyuoqu">
+    <bpmn:participant id="Participant_0bbwr48" name="Firma kurierska" processRef="doreczenie_przesylki" />
+  </bpmn:collaboration>
+  <bpmn:process id="doreczenie_przesylki" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_0xk3mjf">
+      <bpmn:lane id="Lane_Kurier" name="Kurier">
+        <bpmn:flowNodeRef>ManualTask_OdbiorPaczkiZPunktu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualTask_ZaladunekPaczki</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CzyOdbiorcaObecny</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_PaczkaNiedostarczonaZwrot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity_ProceduraZwrotu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TimerEvent_Odczekanie24h</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CzyPonowicProbe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualTask_DostarczenieDoSkrytki</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PolaczeniePrzedZwrotem</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PolaczeniePrzedPonownaProba</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualTask_ProbaDoreczeniaPrzezKuriera</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Magazyn" name="Magazyn">
+        <bpmn:flowNodeRef>ManualTask_RozladunekIMagazyn</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Odbiorca" name="Odbiorca">
+        <bpmn:flowNodeRef>UserTask_PodanieKoduLubPodpisu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_WprowadzenieKoduIOdebraniePaczki</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PolaczeniePoOdebraniu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BoundaryTimer_48h</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_WyslaniePotwierdzeniaDoreczenia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_OdebraniePaczki</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SystemInformatyczny" name="System informatyczny">
+        <bpmn:flowNodeRef>ServiceTask_WprowadzenieParametrowIOplacenie</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_GenerowanieEtykiety</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_RejestracjaNadania</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_SkanowanieIWyznaczanieTrasy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_OptymalizacjaTrasIPrzypisanie</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_ZmianaStatusuWydana</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_WeryfikacjaWariantuDoreczenia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_WyslanieKoduDoOdbiorcy</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Nadawca" name="Nadawca">
+        <bpmn:flowNodeRef>StartEvent_RejestracjaPrzesylki</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualTask_UmieszczeniePaczkiWPunkcie</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_RejestracjaPrzesylki" name="Rejestracja przesylki przez nadawce">
+      <bpmn:outgoing>Flow_0dg88p0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ServiceTask_WprowadzenieParametrowIOplacenie" name="Wprowadzenie parametrow i oplacenie zlecenia">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="wprowadzenie_parametrow_i_oplacenie" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0dg88p0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ka2m5r</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ServiceTask_GenerowanieEtykiety" name="Generowanie etykiety przewozowej">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="generowanie_etykiety" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ka2m5r</bpmn:incoming>
+      <bpmn:outgoing>Flow_0z485a6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:manualTask id="ManualTask_UmieszczeniePaczkiWPunkcie" name="Umieszczenie paczki w punkcie">
+      <bpmn:incoming>Flow_0z485a6</bpmn:incoming>
+      <bpmn:outgoing>Flow_111aad1</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:serviceTask id="ServiceTask_RejestracjaNadania" name="Rejestracja nadania i zmiana statusu na &#34;Nadana&#34;">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="rejestracja_nadania" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_111aad1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xnb4he</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:manualTask id="ManualTask_OdbiorPaczkiZPunktu" name="Odbior paczki z punktu i transport do sortowni">
+      <bpmn:incoming>Flow_0xnb4he</bpmn:incoming>
+      <bpmn:outgoing>Flow_17t5at5</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:serviceTask id="ServiceTask_SkanowanieIWyznaczanieTrasy" name="Skanowanie i wyznaczanie trasy">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="skanowanie_i_wyznaczanie_trasy" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17t5at5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wu37wi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ServiceTask_OptymalizacjaTrasIPrzypisanie" name="Optymalizacja tras i przypisanie do kuriera">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="optymalizacja_tras_i_przypisanie" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_118gwei</bpmn:incoming>
+      <bpmn:outgoing>Flow_0g7eoua</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:manualTask id="ManualTask_ZaladunekPaczki" name="Zaladunek paczki do samochodu">
+      <bpmn:incoming>Flow_0g7eoua</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wdbrsm</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:serviceTask id="ServiceTask_ZmianaStatusuWydana" name="Zmiana statusu na &#34;Wydana do doreczenia&#34;">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="zmiana_statusu_wydana" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1wdbrsm</bpmn:incoming>
+      <bpmn:outgoing>Flow_097m0hc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_WeryfikacjaWariantuDoreczenia" name="Weryfikacja wariantu doreczenia" default="Flow_0p6xxzj">
+      <bpmn:incoming>Flow_097m0hc</bpmn:incoming>
+      <bpmn:outgoing>Flow_15ws5wd</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0p6xxzj</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="ManualTask_RozladunekIMagazyn" name="Rozladunek i rejestracja na stanie magazynowym">
+      <bpmn:incoming>Flow_1wu37wi</bpmn:incoming>
+      <bpmn:outgoing>Flow_118gwei</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="Gateway_CzyOdbiorcaObecny" name="Czy odbiorca obecny?" default="Flow_1408dm6">
+      <bpmn:incoming>Flow_1tthzvt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x07d8t</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1408dm6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_PaczkaNiedostarczonaZwrot" name="paczka niedostarczona (zwrot)">
+      <bpmn:incoming>Flow_0skikwk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="CallActivity_ProceduraZwrotu" name="Procedura zwrotu przesylki">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_Zwrot" propagateAllChildVariables="false" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_174wcah</bpmn:incoming>
+      <bpmn:outgoing>Flow_0skikwk</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:intermediateCatchEvent id="TimerEvent_Odczekanie24h" name="Odczekanie 24h">
+      <bpmn:incoming>Flow_0cj2yhh</bpmn:incoming>
+      <bpmn:outgoing>Flow_13n49we</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1ykhw7l">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="Gateway_CzyPonowicProbe" name="czy ponowic probe?" default="Flow_0jclmof">
+      <bpmn:incoming>Flow_1408dm6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jclmof</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0cj2yhh</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="ManualTask_DostarczenieDoSkrytki" name="Dostarczenie paczki do skrytki">
+      <bpmn:incoming>Flow_0p6xxzj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pk6clw</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:serviceTask id="ServiceTask_WyslanieKoduDoOdbiorcy" name="Wyslanie kodu do odbiorcy">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="wyslanie_kodu_do_odbiorcy" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0pk6clw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0urdag0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_PolaczeniePrzedZwrotem">
+      <bpmn:incoming>Flow_0jclmof</bpmn:incoming>
+      <bpmn:incoming>Flow_0s2mrvz</bpmn:incoming>
+      <bpmn:outgoing>Flow_174wcah</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="UserTask_PodanieKoduLubPodpisu" name="Podanie kodu Pin lub podpisu kurierowi">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1x07d8t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0g1up0i</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="UserTask_WprowadzenieKoduIOdebraniePaczki" name="Wprowadzenie kodu i odebranie paczki">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0urdag0</bpmn:incoming>
+      <bpmn:outgoing>Flow_15blew2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_PolaczeniePoOdebraniu">
+      <bpmn:incoming>Flow_15blew2</bpmn:incoming>
+      <bpmn:incoming>Flow_0g1up0i</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u0y3jt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_PolaczeniePrzedPonownaProba">
+      <bpmn:incoming>Flow_15ws5wd</bpmn:incoming>
+      <bpmn:incoming>Flow_13n49we</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mgaxt4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="ManualTask_ProbaDoreczeniaPrzezKuriera" name="Proba doreczenia paczki przez kuriera">
+      <bpmn:incoming>Flow_0mgaxt4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tthzvt</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:boundaryEvent id="BoundaryTimer_48h" name="48h" attachedToRef="UserTask_WprowadzenieKoduIOdebraniePaczki">
+      <bpmn:outgoing>Flow_0s2mrvz</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_134bng1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT48H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0dg88p0" sourceRef="StartEvent_RejestracjaPrzesylki" targetRef="ServiceTask_WprowadzenieParametrowIOplacenie" />
+    <bpmn:sequenceFlow id="Flow_1ka2m5r" sourceRef="ServiceTask_WprowadzenieParametrowIOplacenie" targetRef="ServiceTask_GenerowanieEtykiety" />
+    <bpmn:sequenceFlow id="Flow_0z485a6" sourceRef="ServiceTask_GenerowanieEtykiety" targetRef="ManualTask_UmieszczeniePaczkiWPunkcie" />
+    <bpmn:sequenceFlow id="Flow_111aad1" sourceRef="ManualTask_UmieszczeniePaczkiWPunkcie" targetRef="ServiceTask_RejestracjaNadania" />
+    <bpmn:sequenceFlow id="Flow_0xnb4he" sourceRef="ServiceTask_RejestracjaNadania" targetRef="ManualTask_OdbiorPaczkiZPunktu" />
+    <bpmn:sequenceFlow id="Flow_17t5at5" sourceRef="ManualTask_OdbiorPaczkiZPunktu" targetRef="ServiceTask_SkanowanieIWyznaczanieTrasy" />
+    <bpmn:sequenceFlow id="Flow_1wu37wi" sourceRef="ServiceTask_SkanowanieIWyznaczanieTrasy" targetRef="ManualTask_RozladunekIMagazyn" />
+    <bpmn:sequenceFlow id="Flow_118gwei" sourceRef="ManualTask_RozladunekIMagazyn" targetRef="ServiceTask_OptymalizacjaTrasIPrzypisanie" />
+    <bpmn:sequenceFlow id="Flow_0g7eoua" sourceRef="ServiceTask_OptymalizacjaTrasIPrzypisanie" targetRef="ManualTask_ZaladunekPaczki" />
+    <bpmn:sequenceFlow id="Flow_1wdbrsm" sourceRef="ManualTask_ZaladunekPaczki" targetRef="ServiceTask_ZmianaStatusuWydana" />
+    <bpmn:sequenceFlow id="Flow_097m0hc" sourceRef="ServiceTask_ZmianaStatusuWydana" targetRef="Gateway_WeryfikacjaWariantuDoreczenia" />
+    <bpmn:sequenceFlow id="Flow_15ws5wd" name="DOM" sourceRef="Gateway_WeryfikacjaWariantuDoreczenia" targetRef="Gateway_PolaczeniePrzedPonownaProba">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= wariant = "DOM"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0p6xxzj" name="SKRYTKA" sourceRef="Gateway_WeryfikacjaWariantuDoreczenia" targetRef="ManualTask_DostarczenieDoSkrytki" />
+    <bpmn:sequenceFlow id="Flow_1tthzvt" sourceRef="ManualTask_ProbaDoreczeniaPrzezKuriera" targetRef="Gateway_CzyOdbiorcaObecny" />
+    <bpmn:sequenceFlow id="Flow_1x07d8t" name="tak" sourceRef="Gateway_CzyOdbiorcaObecny" targetRef="UserTask_PodanieKoduLubPodpisu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= obecny = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1408dm6" name="nie" sourceRef="Gateway_CzyOdbiorcaObecny" targetRef="Gateway_CzyPonowicProbe" />
+    <bpmn:sequenceFlow id="Flow_0skikwk" sourceRef="CallActivity_ProceduraZwrotu" targetRef="EndEvent_PaczkaNiedostarczonaZwrot" />
+    <bpmn:sequenceFlow id="Flow_174wcah" sourceRef="Gateway_PolaczeniePrzedZwrotem" targetRef="CallActivity_ProceduraZwrotu" />
+    <bpmn:sequenceFlow id="Flow_13n49we" sourceRef="TimerEvent_Odczekanie24h" targetRef="Gateway_PolaczeniePrzedPonownaProba" />
+    <bpmn:sequenceFlow id="Flow_0cj2yhh" name="tak" sourceRef="Gateway_CzyPonowicProbe" targetRef="TimerEvent_Odczekanie24h">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= ponowic = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0jclmof" name="nie(wyczerpano)" sourceRef="Gateway_CzyPonowicProbe" targetRef="Gateway_PolaczeniePrzedZwrotem" />
+    <bpmn:sequenceFlow id="Flow_0pk6clw" sourceRef="ManualTask_DostarczenieDoSkrytki" targetRef="ServiceTask_WyslanieKoduDoOdbiorcy" />
+    <bpmn:sequenceFlow id="Flow_0urdag0" sourceRef="ServiceTask_WyslanieKoduDoOdbiorcy" targetRef="UserTask_WprowadzenieKoduIOdebraniePaczki" />
+    <bpmn:sequenceFlow id="Flow_0s2mrvz" sourceRef="BoundaryTimer_48h" targetRef="Gateway_PolaczeniePrzedZwrotem" />
+    <bpmn:sequenceFlow id="Flow_0g1up0i" sourceRef="UserTask_PodanieKoduLubPodpisu" targetRef="Gateway_PolaczeniePoOdebraniu" />
+    <bpmn:sequenceFlow id="Flow_15blew2" sourceRef="UserTask_WprowadzenieKoduIOdebraniePaczki" targetRef="Gateway_PolaczeniePoOdebraniu" />
+    <bpmn:sequenceFlow id="Flow_0mgaxt4" sourceRef="Gateway_PolaczeniePrzedPonownaProba" targetRef="ManualTask_ProbaDoreczeniaPrzezKuriera" />
+    <bpmn:sequenceFlow id="Flow_0u0y3jt" sourceRef="Gateway_PolaczeniePoOdebraniu" targetRef="ServiceTask_WyslaniePotwierdzeniaDoreczenia" />
+    <bpmn:sequenceFlow id="Flow_1xi7sgt" sourceRef="ServiceTask_WyslaniePotwierdzeniaDoreczenia" targetRef="EndEvent_OdebraniePaczki" />
+    <bpmn:serviceTask id="ServiceTask_WyslaniePotwierdzeniaDoreczenia" name="Wyslanie potwierdzenia doreczenia do nadawcy">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="wyslanie_potwierdzenia_doreczenia" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0u0y3jt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xi7sgt</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_OdebraniePaczki" name="odebranie paczki">
+      <bpmn:incoming>Flow_1xi7sgt</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1pyuoqu">
+      <bpmndi:BPMNShape id="Participant_0bbwr48_di" bpmnElement="Participant_0bbwr48" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2018" height="1300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1swg1de_di" bpmnElement="Lane_Nadawca" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1988" height="232" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_00q9gss_di" bpmnElement="Lane_SystemInformatyczny" isHorizontal="true">
+        <dc:Bounds x="160" y="312" width="1988" height="228" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0wkljrb_di" bpmnElement="Lane_Odbiorca" isHorizontal="true">
+        <dc:Bounds x="160" y="1140" width="1988" height="240" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0gobnjz_di" bpmnElement="Lane_Magazyn" isHorizontal="true">
+        <dc:Bounds x="160" y="960" width="1988" height="180" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_08dpc65_di" bpmnElement="Lane_Kurier" isHorizontal="true">
+        <dc:Bounds x="160" y="540" width="1988" height="420" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0avteqx_di" bpmnElement="StartEvent_RejestracjaPrzesylki">
+        <dc:Bounds x="212" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="193" y="102" width="73" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dtz4zm_di" bpmnElement="ServiceTask_WprowadzenieParametrowIOplacenie">
+        <dc:Bounds x="220" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_199syy5_di" bpmnElement="ServiceTask_GenerowanieEtykiety">
+        <dc:Bounds x="370" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bb73k5_di" bpmnElement="ManualTask_UmieszczeniePaczkiWPunkcie">
+        <dc:Bounds x="370" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bgax5m_di" bpmnElement="ServiceTask_RejestracjaNadania">
+        <dc:Bounds x="520" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_081arpp_di" bpmnElement="ManualTask_OdbiorPaczkiZPunktu">
+        <dc:Bounds x="520" y="610" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y9pgh8_di" bpmnElement="ServiceTask_SkanowanieIWyznaczanieTrasy">
+        <dc:Bounds x="680" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ugr72x_di" bpmnElement="ServiceTask_OptymalizacjaTrasIPrzypisanie">
+        <dc:Bounds x="850" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0defq4h_di" bpmnElement="ManualTask_ZaladunekPaczki">
+        <dc:Bounds x="950" y="630" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0whos7b_di" bpmnElement="ServiceTask_ZmianaStatusuWydana">
+        <dc:Bounds x="1060" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1e2z8tw_di" bpmnElement="Gateway_WeryfikacjaWariantuDoreczenia" isMarkerVisible="true">
+        <dc:Bounds x="1255" y="415" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1251" y="365" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k6gc2h_di" bpmnElement="ManualTask_RozladunekIMagazyn">
+        <dc:Bounds x="810" y="1000" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0zi8qc4_di" bpmnElement="Gateway_CzyOdbiorcaObecny" isMarkerVisible="true">
+        <dc:Bounds x="1265" y="705" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1257.5" y="667.5" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0v2z9cj_di" bpmnElement="EndEvent_PaczkaNiedostarczonaZwrot">
+        <dc:Bounds x="1892" y="772" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1873" y="815" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wagsex_di" bpmnElement="CallActivity_ProceduraZwrotu">
+        <dc:Bounds x="1690" y="750" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0c4epjb_di" bpmnElement="TimerEvent_Odczekanie24h">
+        <dc:Bounds x="1362" y="862" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1340" y="905" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ruad0g_di" bpmnElement="Gateway_CzyPonowicProbe" isMarkerVisible="true">
+        <dc:Bounds x="1425" y="765" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1355" y="776.5" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0t751hz_di" bpmnElement="ManualTask_DostarczenieDoSkrytki">
+        <dc:Bounds x="1390" y="570" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07k2g56_di" bpmnElement="ServiceTask_WyslanieKoduDoOdbiorcy">
+        <dc:Bounds x="1520" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_060g12m_di" bpmnElement="Gateway_PolaczeniePrzedZwrotem" isMarkerVisible="true">
+        <dc:Bounds x="1595" y="765" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ftw0sw_di" bpmnElement="UserTask_PodanieKoduLubPodpisu">
+        <dc:Bounds x="1230" y="1180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_156ihrx_di" bpmnElement="UserTask_WprowadzenieKoduIOdebraniePaczki">
+        <dc:Bounds x="1560" y="1180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_184n96q_di" bpmnElement="Gateway_PolaczeniePoOdebraniu" isMarkerVisible="true">
+        <dc:Bounds x="1425" y="1195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wg3vh0_di" bpmnElement="Gateway_PolaczeniePrzedPonownaProba" isMarkerVisible="true">
+        <dc:Bounds x="1065" y="705" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yywac9_di" bpmnElement="ManualTask_ProbaDoreczeniaPrzezKuriera">
+        <dc:Bounds x="1140" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13vbdkv_di" bpmnElement="ServiceTask_WyslaniePotwierdzeniaDoreczenia">
+        <dc:Bounds x="1400" y="1270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0mcftyn_di" bpmnElement="EndEvent_OdebraniePaczki">
+        <dc:Bounds x="1582" y="1292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1558" y="1335" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_08moopr_di" bpmnElement="BoundaryTimer_48h">
+        <dc:Bounds x="1622" y="1242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1631" y="1285" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0dg88p0_di" bpmnElement="Flow_0dg88p0">
+        <di:waypoint x="230" y="188" />
+        <di:waypoint x="230" y="289" />
+        <di:waypoint x="270" y="289" />
+        <di:waypoint x="270" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ka2m5r_di" bpmnElement="Flow_1ka2m5r">
+        <di:waypoint x="320" y="430" />
+        <di:waypoint x="370" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z485a6_di" bpmnElement="Flow_0z485a6">
+        <di:waypoint x="420" y="390" />
+        <di:waypoint x="420" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_111aad1_di" bpmnElement="Flow_111aad1">
+        <di:waypoint x="470" y="180" />
+        <di:waypoint x="570" y="180" />
+        <di:waypoint x="570" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xnb4he_di" bpmnElement="Flow_0xnb4he">
+        <di:waypoint x="570" y="470" />
+        <di:waypoint x="570" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17t5at5_di" bpmnElement="Flow_17t5at5">
+        <di:waypoint x="620" y="650" />
+        <di:waypoint x="730" y="650" />
+        <di:waypoint x="730" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wu37wi_di" bpmnElement="Flow_1wu37wi">
+        <di:waypoint x="780" y="430" />
+        <di:waypoint x="795" y="430" />
+        <di:waypoint x="795" y="1040" />
+        <di:waypoint x="810" y="1040" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_118gwei_di" bpmnElement="Flow_118gwei">
+        <di:waypoint x="860" y="1000" />
+        <di:waypoint x="860" y="700" />
+        <di:waypoint x="900" y="700" />
+        <di:waypoint x="900" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0g7eoua_di" bpmnElement="Flow_0g7eoua">
+        <di:waypoint x="950" y="440" />
+        <di:waypoint x="1000" y="440" />
+        <di:waypoint x="1000" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wdbrsm_di" bpmnElement="Flow_1wdbrsm">
+        <di:waypoint x="1000" y="630" />
+        <di:waypoint x="1000" y="555" />
+        <di:waypoint x="1110" y="555" />
+        <di:waypoint x="1110" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_097m0hc_di" bpmnElement="Flow_097m0hc">
+        <di:waypoint x="1160" y="440" />
+        <di:waypoint x="1255" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15ws5wd_di" bpmnElement="Flow_15ws5wd">
+        <di:waypoint x="1280" y="465" />
+        <di:waypoint x="1280" y="600" />
+        <di:waypoint x="1090" y="600" />
+        <di:waypoint x="1090" y="705" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1187" y="583" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p6xxzj_di" bpmnElement="Flow_0p6xxzj">
+        <di:waypoint x="1310" y="440" />
+        <di:waypoint x="1440" y="440" />
+        <di:waypoint x="1440" y="570" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1349" y="422" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tthzvt_di" bpmnElement="Flow_1tthzvt">
+        <di:waypoint x="1240" y="730" />
+        <di:waypoint x="1265" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x07d8t_di" bpmnElement="Flow_1x07d8t">
+        <di:waypoint x="1290" y="755" />
+        <di:waypoint x="1290" y="998" />
+        <di:waypoint x="1280" y="998" />
+        <di:waypoint x="1280" y="1180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1262" y="754" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1408dm6_di" bpmnElement="Flow_1408dm6">
+        <di:waypoint x="1315" y="730" />
+        <di:waypoint x="1450" y="730" />
+        <di:waypoint x="1450" y="765" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1330" y="713" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0skikwk_di" bpmnElement="Flow_0skikwk">
+        <di:waypoint x="1790" y="790" />
+        <di:waypoint x="1892" y="790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_174wcah_di" bpmnElement="Flow_174wcah">
+        <di:waypoint x="1645" y="790" />
+        <di:waypoint x="1690" y="790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13n49we_di" bpmnElement="Flow_13n49we">
+        <di:waypoint x="1362" y="880" />
+        <di:waypoint x="1090" y="880" />
+        <di:waypoint x="1090" y="755" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cj2yhh_di" bpmnElement="Flow_0cj2yhh">
+        <di:waypoint x="1450" y="815" />
+        <di:waypoint x="1450" y="880" />
+        <di:waypoint x="1398" y="880" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1417" y="862" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jclmof_di" bpmnElement="Flow_0jclmof">
+        <di:waypoint x="1475" y="790" />
+        <di:waypoint x="1595" y="790" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1479" y="772" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pk6clw_di" bpmnElement="Flow_0pk6clw">
+        <di:waypoint x="1490" y="610" />
+        <di:waypoint x="1505" y="610" />
+        <di:waypoint x="1505" y="460" />
+        <di:waypoint x="1520" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0urdag0_di" bpmnElement="Flow_0urdag0">
+        <di:waypoint x="1570" y="500" />
+        <di:waypoint x="1570" y="840" />
+        <di:waypoint x="1610" y="840" />
+        <di:waypoint x="1610" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s2mrvz_di" bpmnElement="Flow_0s2mrvz">
+        <di:waypoint x="1640" y="1278" />
+        <di:waypoint x="1640" y="1290" />
+        <di:waypoint x="1740" y="1290" />
+        <di:waypoint x="1740" y="910" />
+        <di:waypoint x="1620" y="910" />
+        <di:waypoint x="1620" y="815" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0g1up0i_di" bpmnElement="Flow_0g1up0i">
+        <di:waypoint x="1330" y="1220" />
+        <di:waypoint x="1425" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15blew2_di" bpmnElement="Flow_15blew2">
+        <di:waypoint x="1560" y="1220" />
+        <di:waypoint x="1475" y="1220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mgaxt4_di" bpmnElement="Flow_0mgaxt4">
+        <di:waypoint x="1115" y="730" />
+        <di:waypoint x="1140" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u0y3jt_di" bpmnElement="Flow_0u0y3jt">
+        <di:waypoint x="1450" y="1245" />
+        <di:waypoint x="1450" y="1270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xi7sgt_di" bpmnElement="Flow_1xi7sgt">
+        <di:waypoint x="1500" y="1310" />
+        <di:waypoint x="1582" y="1310" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

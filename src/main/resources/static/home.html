@@ -72,7 +72,7 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <span>Zalogowany jako: <strong id="username">Użytkownik</strong></span>
-            <button type="button">Nadaj paczkę</button>
+            <a id="send-package-link" href="/doreczenie/nadaj-paczke.html" class="btn-link">Nadaj paczkę</a>
         </div>
         <div class="top-bar-right">
             <a href="/rejestracja/logowanie.html" class="btn-link">Wyloguj się</a>
@@ -96,6 +96,7 @@
         const login = params.get('login');
         if (login) {
             document.getElementById('username').textContent = login;
+            document.getElementById('send-package-link').href = '/doreczenie/nadaj-paczke.html?login=' + encodeURIComponent(login);
         }
     </script>
 </body>
